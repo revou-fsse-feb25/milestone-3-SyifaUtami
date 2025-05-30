@@ -14,15 +14,15 @@ export default function NavBar() {
         </div>
           <ul className="flex space-x-6 text-sm md:text-base">
             <li>
-              <Link href="/" className="hover:underline">Home</Link> {/* src/app/page.js */}
+              <Link href="/" className="hover:underline">Home</Link> {/* go to src/app/page.js */}
             </li>
             <li>
-              <Link href="/about" className="hover:underline">About</Link> {/* src/app/about/page.js */}
+              <Link href="/about" className="hover:underline">About</Link> {/* go to src/app/about/page.js */}
             </li>
           </ul>
         </div>
         
-      {/* Right side: cart */}
+      {/*cart icon stuff*/}
       <div className="flex items-center space-x-2">
         <Link href="/cart" className="hover:text-[#1ceff4]">
           <FaShoppingCart className="h-6 w-6" />
