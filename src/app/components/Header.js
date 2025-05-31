@@ -1,6 +1,5 @@
 
 import Image from 'next/image';
-import Highlighted from './Textstyle.js';
 
 export default function Header() {
   return (

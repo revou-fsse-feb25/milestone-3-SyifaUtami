@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FaMask, FaShoppingCart } from 'react-icons/fa';
+import { FaMask, FaShoppingCart, FaUser } from 'react-icons/fa';
 
 export default function NavBar() {
     return (
@@ -23,9 +23,12 @@ export default function NavBar() {
         </div>
         
       {/*cart icon stuff*/}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-10">
         <Link href="/cart" className="hover:text-[#1ceff4]">
           <FaShoppingCart className="h-6 w-6" />
+        </Link>
+      <Link href="/dashboard" className="hover:text-[#1ceff4]">
+        <FaUser className="h-6 w-6" />
         </Link>
       </div>
     </nav>
