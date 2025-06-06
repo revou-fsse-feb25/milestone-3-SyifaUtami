@@ -1,14 +1,19 @@
 import Highlighted from '@/app/components/Textstyle';
 import { notFound } from 'next/navigation';
-import ProductCard from '../../../app/components/ProductCard';
 import BackButton from '../../../app/components/BackButton';
 import AddToCart from '@/app/components/AddToCart';
+import dynamic from 'next/dynamic';
+
+const LazyProductCard = dynamic(() => import('@/app/components/ProductCard'), {
+  loading: () => <p>Loading...</p>,
+});
 
 export default async function ProductPage({ params }) {
   const resolvedParams = await params;
   const { id } = resolvedParams;
 
-  const res = await fetch(`https://api.escuelajs.co/api/v1/products/${id}`);
+  const res = await fetch(`https://api.escuelajs.co/api/v1/products/${id}`, {next: { revalidate: 60 }}); //refresh cache (uses revalidate: performance boost, but make delay few minutes)
+
 
   if (!res.ok) return notFound();
 
@@ -56,7 +61,7 @@ export default async function ProductPage({ params }) {
       
       <div className='py-20'>
         <h2>Check out other good stuff</h2>
-        <ProductCard />
+        <LazyProductCard />
       </div>
     </div>
   );

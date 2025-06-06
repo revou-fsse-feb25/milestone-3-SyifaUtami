@@ -18,15 +18,13 @@ export async function middleware(request) {
     console.log("User role:", userRole);
     console.log("User email:", token?.email);
 
-    // ADMIN PAGE ACCESS CONTROL
+    // Admin page access
     if (path.startsWith("/admin")) {
         console.log("Admin page access requested...");
         
         if (!isAuthenticated) {
             console.log("Not authenticated - redirecting to login");
-            const loginUrl = new URL("/login", request.url);
-            loginUrl.searchParams.set("redirect", path);
-            return NextResponse.redirect(loginUrl);
+            return NextResponse.redirect(new URL("/unauthorized", request.url));
         }
         
         if (userRole !== "admin") {
@@ -53,7 +51,7 @@ export async function middleware(request) {
         return NextResponse.next();
     }
 
-    // Allow all other requests (public pages, API routes, etc.)
+    // Allow all other stuff be accessed
     return NextResponse.next();
 }
 

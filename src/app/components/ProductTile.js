@@ -4,8 +4,16 @@ import { useCart } from '@/app/Context/CartContext';
 export default function ProductTile({ item }) {
   const { updateQuantity, removeFromCart } = useCart();
 
+  // Add safety checks
+  const price = item?.price ?? 0;
+  const quantity = item?.quantity ?? 1;
+  const title = item?.title ?? 'Unknown Product';
+  const imageUrl = item?.images?.[0] || item?.image || '/placeholder-image.jpg';
+
   const handleQuantityChange = (newQuantity) => {
-    updateQuantity(item.id, newQuantity);
+    // Prevent negative quantities
+    const validQuantity = Math.max(0, newQuantity);
+    updateQuantity(item.id, validQuantity);
   };
 
   const handleRemove = () => {
@@ -13,135 +21,51 @@ export default function ProductTile({ item }) {
   };
 
   return (
-    <div className="product-tile">
+    <div className="flex items-center justify-between p-4 border border-gray-300 rounded-lg mb-4 bg-white">
       {/* Product Image */}
-      <div className="product-image">
+      <div className="w-20 h-20 mr-4 flex-shrink-0">
         <img 
-          src={item.images?.[0] || item.image} 
-          alt={item.title}
+          src={imageUrl}
+          alt={title}
+          className="w-full h-full object-cover rounded"
+          onError={(e) => {
+            e.target.src = '/placeholder-image.jpg';
+          }}
         />
       </div>
-      <div className="product-info">
-        <h3 className="product-name">{item.title}</h3>
-        <p className="product-price">${item.price.toFixed(2)}</p>
+      
+      <div className="flex-1">
+        <h3 className="text-lg font-bold mb-2">{title}</h3>
+        <p className="text-gray-600 m-0">${price.toFixed(2)}</p>
       </div>
       
-      <div className="quantity-controls">
+      <div className="flex items-center gap-2 mx-4">
         <button 
-          onClick={() => handleQuantityChange(item.quantity - 1)}
-          className="quantity-btn"
+          onClick={() => handleQuantityChange(quantity - 1)}
+          className="bg-gray-100 border border-gray-300 rounded w-8 h-8 cursor-pointer flex items-center justify-center hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={quantity <= 1}
         >
           -
         </button>
-        <span className="quantity">{item.quantity}</span>
+        <span className="font-bold min-w-8 text-center">{quantity}</span>
         <button 
-          onClick={() => handleQuantityChange(item.quantity + 1)}
-          className="quantity-btn"
+          onClick={() => handleQuantityChange(quantity + 1)}
+          className="bg-gray-100 border border-gray-300 rounded w-8 h-8 cursor-pointer flex items-center justify-center hover:bg-gray-200"
         >
           +
         </button>
       </div>
       
-      <div className="item-total">
-        ${(item.price * item.quantity).toFixed(2)}
+      <div className="font-bold text-lg mx-4 min-w-16 text-right">
+        ${(price * quantity).toFixed(2)}
       </div>
       
-      <button onClick={handleRemove} className="remove-btn">
+      <button 
+        onClick={handleRemove} 
+        className="bg-red-600 text-white border-none px-4 py-2 rounded cursor-pointer text-sm hover:bg-red-700"
+      >
         Remove
       </button>
-
-      <style jsx>{`
-        .product-tile {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 1rem;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          margin-bottom: 1rem;
-          background: white;
-        }
-        
-        .product-image {
-          width: 80px;
-          height: 80px;
-          margin-right: 1rem;
-          flex-shrink: 0;
-        }
-        
-        .product-image img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          border-radius: 4px;
-        }
-        
-        .product-info {
-          flex: 1;
-        }
-        
-        .product-name {
-          margin: 0 0 0.5rem 0;
-          font-size: 1.1rem;
-          font-weight: bold;
-        }
-        
-        .product-price {
-          margin: 0;
-          color: #666;
-        }
-        
-        .quantity-controls {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          margin: 0 1rem;
-        }
-        
-        .quantity-btn {
-          background: #f0f0f0;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          width: 30px;
-          height: 30px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        
-        .quantity-btn:hover {
-          background: #e0e0e0;
-        }
-        
-        .quantity {
-          font-weight: bold;
-          min-width: 2rem;
-          text-align: center;
-        }
-        
-        .item-total {
-          font-weight: bold;
-          font-size: 1.1rem;
-          margin: 0 1rem;
-          min-width: 4rem;
-          text-align: right;
-        }
-        
-        .remove-btn {
-          background: #dc3545;
-          color: white;
-          border: none;
-          padding: 0.5rem 1rem;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.9rem;
-        }
-        
-        .remove-btn:hover {
-          background: #c82333;
-        }
-      `}</style>
     </div>
   );
 }

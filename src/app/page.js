@@ -1,6 +1,3 @@
-import Image from "next/image";
-import NavBar from "./components/NavBar";
-import Link from 'next/link';
 import Header from './components/Header';
 import Highlighted from "./components/Textstyle";
 import ProductCard from './components/ProductCard';

@@ -1,5 +1,4 @@
 import ProductSearch from '@/app/components/ProductSearch';
-import {FaBoxOpen} from 'react-icons/fa';
 import Link from 'next/link';
 
 
