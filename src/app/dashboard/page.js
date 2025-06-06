@@ -1,37 +1,26 @@
 'use client'
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useUser } from "@/app/Context/UserContext"; // Update this path to match your file structure
+import { useSession, signOut} from "next-auth/react"
 
 export default function Dashboard() {
     const router = useRouter();
-    const { user, isAuthenticated, isLoading, logout } = useUser();
+    const { data: session, status } = useSession();
 
     useEffect(() => {
-        // If not loading and not authenticated, redirect to login
-        if (!isLoading && !isAuthenticated) {
-            router.replace("/login");
+        if (status == "unauthenticated") {
+            router.replace("/login")
         }
-    }, [isAuthenticated, isLoading, router]);
-
-    // Show loading state while checking authentication
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-[#1C1C1C]">
-                <div>Loading...</div>
-            </div>
-        );
-    }
-
-    // If not authenticated, don't render anything (redirect will happen)
-    if (!isAuthenticated || !user) {
-        return null;
-    }
+    }, [status, router]);
 
     const handleLogout = () => {
-        logout();
-        router.replace("/login");
+        signOut({callbackUrl: "/login"})
+        document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     };
+    if (status == "loading") {
+        return <div>loading...</div>
+    }
+    const user = session?.user || {};
 
     return (
         <div className="p-6 min-h-screen">
@@ -40,6 +29,7 @@ export default function Dashboard() {
                 <h1>Dashboard</h1>
                 <button
                     onClick={handleLogout}
+                    
                     className="bg-[#1ceff4] text-[#1C1C1C] px-4 py-2 border-none rounded cursor-pointer"
                 >
                     Logout
@@ -50,10 +40,10 @@ export default function Dashboard() {
         <div className="flex flex-col md:flex-row items-center gap-6 bg-[#1C1C1C] p-10 rounded text-white">
             {/* User Avatar */}
             <div>
-                {user.avatar ? (
+                {user?.image ? (
                     <img
-                        src={user.avatar}
-                        alt={`${user.name}'s avatar`}
+                        src={user.image}
+                        alt={`${user.image}'s avatar`}
                         className="w-20 h-20 rounded-full object-cover border-4 border-[#1ceff4]"
                         onError={(e) => {
                             e.target.style.display = 'none';
@@ -61,19 +51,13 @@ export default function Dashboard() {
                         }}
                     />
                 ) : null}
-        <div 
-            className="w-20 h-20 rounded-full bg-[#1ceff4] flex items-center justify-center text-white text-3xl font-bold"
-            style={{ display: user.avatar ? 'none' : 'flex' }}
-        >
-            {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
         </div>
-    </div>
 
         {/* User Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 w-full">
             <div>
                 <p className="text-[#1ceff4] mb-1">Name</p>
-                <p>{user.name || 'Not provided'}</p>
+                <p>{user?.name || 'Not provided'}</p>
             </div>
             <div>
                 <p className="text-[#1ceff4] mb-1">Customer ID</p>
@@ -81,12 +65,12 @@ export default function Dashboard() {
             </div>
             <div>
                 <p className="text-[#1ceff4] mb-1">Email</p>
-                <p>{user.email}</p>
+                <p>{user?.email}</p>
             </div>
             <div>
                 <p className="text-[#1ceff4] mb-1">Role</p>
                 <span className="bg-[#1ceff4] text-[#1C1C1C] px-3 py-1 rounded-full text-sm">
-                    {user.role || 'customer'}
+                    {user?.role || 'unknown'}
                 </span>
             </div>
         </div>
@@ -94,7 +78,7 @@ export default function Dashboard() {
             {/* Welcome Message */}
             <div className="py-10">
                 <h2 className="mb-4">Welcome Back!</h2>
-                <p>Hello {user.name}, your account is active and ready to use.</p>
+                <p>Hello {user.name || 'thief'}, your account is active and ready to use.</p>
             </div>
         </div>
     );

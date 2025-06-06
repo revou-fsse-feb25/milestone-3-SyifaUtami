@@ -3,45 +3,56 @@
 import { useState } from 'react';
 import Highlighted from "@/app/components/Textstyle";
 import { useRouter } from "next/navigation";
+import {signIn} from "next-auth/react";
 
 export default function LoginPage() {
-    const router = useRouter();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const router = useRouter(); 
     const [loading, setLoading] = useState(false);
     
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent form default submission
-        setError(""); // Clear previous errors
-        
+        e.preventDefault(); 
+        setError("");
         setLoading(true);
+
         try {
-            const response = await fetch("https://api.escuelajs.co/api/v1/auth/login", {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json" // Fixed: was "application-json"
-                },
-                body: JSON.stringify({ email, password }),
+            const res = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
             });
             
-            if (!response.ok) {
-                throw new Error("Invalid credentials");
+            if (res?.ok) {
+                const sessionRes = await fetch('https://api.escuelajs.co/api/v1/users') //look for role
+                const session = await sessionRes.json(); 
+                const role = session?.user?.role;
+                if (role) {
+                    document.cookie = `userRole=${role}; path=/; max-age=86400; SameSite=Lax`;
+                }
+                router.push("/dashboard");
+            } else {
+                setError("Invalid credentials");
             }
-            
-            const data = await response.json();
-            
-            // Store token 
-            localStorage.setItem("access_token", data.access_token);
-            router.push("/dashboard"); //route to dashboard
-
         } catch (error) {
-            setError(error.message || "Login failed");
+            setError("An error occurred during login");
         } finally {
             setLoading(false);
         }
-    }; 
-
+    };
+ /*       const res = await signIn("credentials", {
+            email,
+            password,
+            redirect: false,
+        })
+        if (res.ok) {
+            router.push("/dashboard");
+        } else {
+            setError("invalid credentials")
+        }
+    }; */
+        
     return (
         <div className="min-h-screen flex items-center justify-center p-6">
             <form onSubmit={handleSubmit}>
@@ -59,7 +70,7 @@ export default function LoginPage() {
                     type="email"
                     placeholder="Enter your email"
                     value={email||''}
-                    onChange={(e) => setEmail(e.target.value)}/*on change, update state */ 
+                    onChange={(e) => setEmail(e.target.value)}
                     className="mb-2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1ceff4]"
                     required
                 />
@@ -75,7 +86,7 @@ export default function LoginPage() {
                 
                 <button
                     type="submit"
-                    disabled={loading} //dont click button when load 
+                    disabled={loading}
                     className="w-full bg-[#1ceff4] text-[#1C1C1C] font-bold py-2 rounded-lg hover:bg-cyan-300 transition disabled:opacity-50"
                 >
                     {loading ? 'Logging in...' : 'Submit'}

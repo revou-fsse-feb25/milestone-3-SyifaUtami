@@ -1,10 +1,30 @@
 'use client';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
+
+  // Load cart from localStorage on component mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cartItems');
+    if (savedCart) {
+      try {
+        const cartData = JSON.parse(savedCart);
+        setCartItems(cartData);
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
+        // If there's an error, clear the corrupted data
+        localStorage.removeItem('cartItems');
+      }
+    }
+  }, []);
+
+  // Save cart to localStorage whenever cartItems changes
+  useEffect(() => {
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const addToCart = (product, quantity) => {
     setCartItems(prevItems => {
@@ -42,6 +62,10 @@ export function CartProvider({ children }) {
     setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
   };
 
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
@@ -56,6 +80,7 @@ export function CartProvider({ children }) {
       addToCart,
       updateQuantity,
       removeFromCart,
+      clearCart,
       getCartTotal,
       getCartItemCount
     }}>

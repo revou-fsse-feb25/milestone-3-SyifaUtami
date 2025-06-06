@@ -1,3 +1,13 @@
+## To add
+- Admin Dashboard (CRUD with API Routes & ISR):
+Create an admin panel where users can view, add, edit, and delete products.
+Implement API Routes for CRUD operations.
+Use Incremental Static Regeneration (ISR) to update pages dynamically.
+- Unit Testing & Performance Optimization:
+Write unit tests for components using Jest & React Testing Library.
+Optimize performance with lazy loading, caching, and custom hooks.
+
+
 ## Welcome to my project
 Here is my attempt at learning Next.js . Current features are:
 
@@ -25,7 +35,8 @@ For the components:
 - uses [id]
 - uses routing for product details that fetch product information and map them
   
-Is still figuring out using NextAuth.js, and Context API/Zustand/Redux.
+## login page: 
+- added forms 
 ***
 
 

@@ -1,10 +1,21 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../Context/CartContext';
 
 export default function AddToCart({ product }) {
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
+  const [showMessage, setShowMessage] = useState(false);
+  const { addToCart, cartItems } = useCart();
+
+  // Update quantity based on existing cart item
+  useEffect(() => {
+    const existingItem = cartItems.find(item => item.id === product.id);
+    if (existingItem) {
+      setQuantity(existingItem.quantity);
+    } else {
+      setQuantity(1);
+    }
+  }, [cartItems, product.id]);
 
   const handleIncrement = () => {
     setQuantity(prev => prev + 1);
@@ -15,25 +26,34 @@ export default function AddToCart({ product }) {
   };
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
-    // Optional: Reset quantity after adding
-    setQuantity(1);
+    const existingItem = cartItems.find(item => item.id === product.id);
+    const quantityToAdd = existingItem ? quantity - existingItem.quantity : quantity;
+    
+    if (quantityToAdd > 0) {
+      addToCart(product, quantityToAdd);
+      
+      // Show success message
+      setShowMessage(true);
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 2000);
+    }
   };
 
   return (
-    <div className="add-to-cart-container">
-      <div className="quantity-selector">
+    <div className="flex items-center gap-4 my-4 relative">
+      <div className="flex items-center border border-gray-300 rounded">
         <button 
           onClick={handleDecrement}
-          className="quantity-btn"
+          className="bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed border-none px-3 py-2 cursor-pointer text-lg min-w-[40px]"
           disabled={quantity <= 1}
         >
           -
         </button>
-        <span className="quantity-display">{quantity}</span>
+        <span className="px-4 py-2 font-bold min-w-[2rem] text-center">{quantity}</span>
         <button 
           onClick={handleIncrement}
-          className="quantity-btn"
+          className="bg-gray-100 hover:bg-gray-200 border-none px-3 py-2 cursor-pointer text-lg min-w-[40px]"
         >
           +
         </button>
@@ -41,67 +61,16 @@ export default function AddToCart({ product }) {
       
       <button 
         onClick={handleAddToCart}
-        className="add-to-cart-btn"
+        className="bg-[#1C1C1C] hover:bg-[#1ceff4] hover:text-black text-white border-none px-6 py-3 rounded cursor-pointer font-bold transition-all duration-300"
       >
         Add to Cart
       </button>
 
-      <style jsx>{`
-        .add-to-cart-container {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin: 1rem 0;
-        }
-        
-        .quantity-selector {
-          display: flex;
-          align-items: center;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-        }
-        
-        .quantity-btn {
-          background: #f5f5f5;
-          border: none;
-          padding: 0.5rem 0.75rem;
-          cursor: pointer;
-          font-size: 1.2rem;
-          min-width: 40px;
-        }
-        
-        .quantity-btn:hover:not(:disabled) {
-          background: #e0e0e0;
-        }
-        
-        .quantity-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-        
-        .quantity-display {
-          padding: 0.5rem 1rem;
-          font-weight: bold;
-          min-width: 2rem;
-          text-align: center;
-        }
-        
-        .add-to-cart-btn {
-          background:#1C1C1C;
-          color: white;
-          border: none;
-          padding: 0.75rem 1.5rem;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 1rem;
-          font-weight: bold;
-        }
-        
-        .add-to-cart-btn:hover {
-          background:#1ceff4;
-        }
-          color: black;
-      `}</style>
+      {showMessage && (
+        <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-[#1ceff4] text-black px-4 py-2 rounded text-sm whitespace-nowrap z-10 animate-fade">
+          {quantity === 1 ? '1 item' : `${quantity} items`} added to cart!
+        </div>
+      )}
     </div>
   );
 }

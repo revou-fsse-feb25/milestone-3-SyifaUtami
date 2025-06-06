@@ -1,17 +1,17 @@
 'use client';
+
 import Highlighted from './Textstyle';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-export default function ProductCard({ 
-  products = null,           // Accept products as prop
-  productsPerPage = 8,       // Configurable products per page
-  showPagination = true      // Option to show/hide pagination
+export default function EditableProductCard({ 
+  products = null,
+  productsPerPage = 8,
+  showPagination = true
 }) {
   const [allProducts, setAllProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Fetch products only if not provided as props
   useEffect(() => {
     if (!products) {
       async function fetchProduct() {
@@ -23,10 +23,8 @@ export default function ProductCard({
     }
   }, [products]);
 
-  // Use provided products or fetched products
   const displayProducts = products || allProducts;
 
-  // Pagination logic
   const totalPages = Math.ceil(displayProducts.length / productsPerPage);
   const start = (currentPage - 1) * productsPerPage;
   const end = start + productsPerPage;
@@ -40,19 +38,17 @@ export default function ProductCard({
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
-  // Reset to page 1 when products change
   useEffect(() => {
     setCurrentPage(1);
   }, [displayProducts]);
 
   return (
     <div className="p-6">
-      {/* Products Grid */} 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {currentProducts.map((product) => (
           <Link
-            key={product.id} 
-            href={`/Product/${product.id}`}
+            key={product.id}
+            href={`/admin/products/edit/${product.id}`}
             className="transform transition-transform duration-300 hover:scale-105"
           >
             <div className="bg-white shadow-md rounded-xl overflow-hidden h-70">
@@ -77,7 +73,6 @@ export default function ProductCard({
         ))}
       </div>
 
-      {/* Pagination - Only show if enabled and there are multiple pages */}
       {showPagination && totalPages > 1 && (
         <div className="flex justify-center mt-8 space-x-4">
           <button
@@ -102,7 +97,6 @@ export default function ProductCard({
         </div>
       )}
 
-      {/* Results info */}
       {displayProducts.length > 0 && (
         <div className="text-center mt-4 text-sm text-gray-600">
           Showing {start + 1}-{Math.min(end, displayProducts.length)} of {displayProducts.length} products
@@ -111,83 +105,3 @@ export default function ProductCard({
     </div>
   );
 }
-
-/* Previous version
-
-export default function ProductCard() {
-  const [products, setProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 8;
-
-  useEffect(() => {
-    async function fetchProduct() {
-      const res = await fetch('https://api.escuelajs.co/api/v1/products');
-      const data = await res.json();
-      setProducts(data);
-    }
-    fetchProduct();
-
-  }, []);
-
-//count page number//
-  const totalPages = Math.ceil(products.length / productsPerPage);
-  const start = (currentPage - 1) * productsPerPage;
-  const end = start + productsPerPage;
-  const currentProducts = products.slice(start, end);
-
-  const nextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  };
-
-  const prevPage = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  };
-
-  return (
-    <div className="p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {currentProducts.map((product) => (
-        <Link
-            key={product.id}
-            href={`/Product/${product.id}`}
-            className="transform transition-transform duration-300 hover:scale-105"
-        >
-          <div key={product.id} className="bg-white shadow-md rounded-xl overflow-hidden h-70">
-            <img
-              src={product.images[0]}
-              alt={product.title}
-              className="w-full h-40 object-cover"
-            />
-            <div className="p-4">
-                <h3>{product.title}</h3>
-                <p> {''} <Highlighted> ${product.price} </Highlighted> </p>
-            </div>
-          </div>
-        </Link>
-        ))}
-      </div>
-
-      {/* page buttons 
-      <div className="flex justify-center mt-8 space-x-4">
-        <button className='cursor-pointer'
-          onClick={prevPage}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-
-        <span className="self-center font-medium text-gray-400">
-          Page {currentPage} of {totalPages}
-        </span>
-
-        <button className='cursor-pointer'
-          onClick={nextPage}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-} */
-
