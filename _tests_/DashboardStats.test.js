@@ -75,7 +75,7 @@ describe('DashboardStats Component', () => {
     });
   });
 
-  // ✅ USER INTERACTIONS (1 test)
+  // user interatc(1 test)
   describe('User Interactions', () => {
     test('buttons are functional', () => {
       render(<DashboardStats data={mockData} />);

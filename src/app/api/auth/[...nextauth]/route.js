@@ -72,7 +72,7 @@ const handler = NextAuth({
                 token.picture = user.image; 
                 token.role = user.role;
             }
-            return token;
+            return token; // uses cache
           },
           async session({ session, token }) {
             session.accessToken = token.accessToken;

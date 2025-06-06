@@ -33,7 +33,7 @@ describe('AddToCart Component', () => {
     jest.useRealTimers();
   });
 
-  // ✅ DATA FLOW (2 tests)
+  // checkingdata flow stuff(2 tests)
   describe('Data Flow', () => {
     test('renders with initial quantity of 1', () => {
       render(<AddToCart product={mockProduct} />);
@@ -51,7 +51,7 @@ describe('AddToCart Component', () => {
     });
   });
 
-  // ✅ USER INTERACTIONS (4 tests)
+  // user interact wirh buttons (4 tests)
   describe('User Interactions', () => {
     test('increment and decrement buttons work', () => {
       render(<AddToCart product={mockProduct} />);
@@ -78,7 +78,7 @@ describe('AddToCart Component', () => {
       
       const decrementBtn = screen.getByText('-');
       
-      // Try to decrease below 1
+      // Try to decrease below 1, shouldn't be possible
       fireEvent.click(decrementBtn);
       fireEvent.click(decrementBtn);
       
